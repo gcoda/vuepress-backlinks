@@ -2,6 +2,9 @@ const { path } = require("@vuepress/shared-utils")
 
 module.exports = (options = {}, ctx) => ({
   name: "vuepress-backlinks",
+  extendMarkdown: md => {
+    md.use(require("./wikilink"))
+  },
   ready() {
     ctx.backLinks = ctx.pages
       .map(page => ({
@@ -59,7 +62,7 @@ module.exports = (options = {}, ctx) => ({
 
     if (!$page.title)
       Object.assign($page, { title: $page.path.split(/\/|_/).join(" ") })
-    
+
     Object.assign($page, { pageLinks })
   },
 
