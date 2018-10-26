@@ -26,11 +26,23 @@ module.exports = (options = {}, ctx) => ({
   },
   extendPageData($page) {
     const pageDir = path.parse($page.regularPath).dir
-    const content = $page._strippedContent || ''
+    const content = $page._strippedContent || ""
+
+    const wikiLinksMatch = content.match(/\[{2}\s*(.+?)\s*\]{2}/g) || []
+    const wikiLinks = wikiLinksMatch.map(mdLink => {
+      const match = mdLink.match(/\[\[((.*))\]\]/u) || ""
+      const wl = match[1] && match[1].split("|")
+      const linkPath = wl[wl.length - 1]
+      const { root } = path.parse(linkPath)
+
+      const link = root === "/" ? linkPath : path.join(pageDir, linkPath)
+      return link
+    })
+
     // regex source: https://stackoverflow.com/questions/44511043
     // /regex-to-match-local-markdown-links
-    const linksMatch = content
-      .match(
+    const linksMatch =
+      content.match(
         /((!?\[[^\]]*?\])\((?:(?!http|www\.|\#|\.com|\.net|\.info|\.org).)*?\))/g
       ) || []
     const pageLinks = linksMatch
@@ -43,6 +55,7 @@ module.exports = (options = {}, ctx) => ({
 
         return link
       })
+      .concat(wikiLinks)
 
     if (!$page.title)
       Object.assign($page, { title: $page.path.split(/\/|_/).join(" ") })
