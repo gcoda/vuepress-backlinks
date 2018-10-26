@@ -1,5 +1,9 @@
 # Back Links
 
+## Now with Wiki Links
+
+* simplest form of ikiwiki style links `[[text|url]]` only
+
 `this.$backLinks` on each page with links to page refers to it
 
 it uses computed method from generated map loaded as module, might be a bit to slow on large sites
