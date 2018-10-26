@@ -43,6 +43,9 @@ module.exports = (options = {}, ctx) => ({
 
         return link
       })
+
+    if (!$page.title)
+      Object.assign($page, { title: $page.path.split(/\/|_/).join(" ") })
     
     Object.assign($page, { pageLinks })
   },
