@@ -26,13 +26,14 @@ module.exports = (options = {}, ctx) => ({
   },
   extendPageData($page) {
     const pageDir = path.parse($page.regularPath).dir
-
+    const content = $page._strippedContent || ''
     // regex source: https://stackoverflow.com/questions/44511043
     // /regex-to-match-local-markdown-links
-    const pageLinks = $page._strippedContent
+    const linksMatch = content
       .match(
         /((!?\[[^\]]*?\])\((?:(?!http|www\.|\#|\.com|\.net|\.info|\.org).)*?\))/g
-      )
+      ) || []
+    const pageLinks = linksMatch
       .map(mdLink => {
         const match = mdLink.match(/\((.*)\)/u)
         const linkPath = path.trimExt(match && match[1])
