@@ -10,10 +10,21 @@ module.exports = (options = {}, ctx) => ({
       .map(page => ({
         regularPath: page.regularPath,
         backLinks: ctx.pages
-          .filter(link =>
-            link.pageLinks //
-              .includes(path.trimExt(page.regularPath))
-          )
+          .filter(link => {
+            return link.pageLinks
+              .reduce((links, l) => [...links, l.path], [])
+              .filter(parsedPath => {
+                const link = parsedPath
+                  .replace('.md', '')
+                  .replace('.html', '')
+                  .replace(/\//g, '')
+                const path = page.path
+                  .replace('.md', '')
+                  .replace('.html', '')
+                  .replace(/\//g, '')
+                return path === link
+              }).length
+          })
           .map(link => ({
             title: link.title,
             path: link.path,
