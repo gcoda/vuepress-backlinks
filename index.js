@@ -63,14 +63,14 @@ module.exports = (options = {}, ctx) => ({
     const pageLinks = linksMatch
       .map(mdLink => {
         const match = mdLink.match(/\((.*)\)/u)
+        const matchTitle = mdLink.match(/\[(.*)\]/u)
+        const title = matchTitle && matchTitle[1]
         const linkPath = match && match[1]
-        const { root } = path.parse(linkPath)
 
         const linkAbsolute =
           linkPath.charAt(0) === '/' ? linkPath : path.join(pageDir, linkPath)
-        const link = root === "/" ? linkPath : path.join(pageDir, linkPath)
-
-        return link
+        const link = linkAbsolute.replace('.html', '').replace('.md', '')
+        return { title, path: link }
       })
       .concat(wikiLinks)
 
