@@ -1,9 +1,9 @@
-const { path } = require("@vuepress/shared-utils")
+const { path } = require('@vuepress/shared-utils')
 
 module.exports = (options = {}, ctx) => ({
-  name: "vuepress-backlinks",
+  name: 'vuepress-backlinks',
   extendMarkdown: md => {
-    md.use(require("./wikilink"))
+    md.use(require('./wikilink'))
   },
   ready() {
     ctx.backLinks = ctx.pages
@@ -29,17 +29,18 @@ module.exports = (options = {}, ctx) => ({
   },
   extendPageData($page) {
     const pageDir = path.parse($page.regularPath).dir
-    const content = $page._strippedContent || ""
+    const content = $page._strippedContent || ''
 
     const wikiLinksMatch = content.match(/\[{2}\s*(.+?)\s*\]{2}/g) || []
     const wikiLinks = wikiLinksMatch.map(mdLink => {
-      const match = mdLink.match(/\[\[((.*))\]\]/u) || ""
-      const wl = match[1] && match[1].split("|")
+      const match = mdLink.match(/\[\[((.*))\]\]/u) || ''
+      const wl = match[1] && match[1].split('|')
       const linkPath = wl[wl.length - 1]
+      const title = wl[0]
       const { root } = path.parse(linkPath)
 
-      const link = root === "/" ? linkPath : path.join(pageDir, linkPath)
-      return link
+      const link = root === '/' ? linkPath : path.join(pageDir, linkPath)
+      return { title, path: link }
     })
 
     // regex source: https://stackoverflow.com/questions/44511043
@@ -61,7 +62,7 @@ module.exports = (options = {}, ctx) => ({
       .concat(wikiLinks)
 
     if (!$page.title)
-      Object.assign($page, { title: $page.path.split(/\/|_/).join(" ") })
+      Object.assign($page, { title: $page.path.split(/\/|_/).join(' ') })
 
     Object.assign($page, { pageLinks })
   },
@@ -69,11 +70,11 @@ module.exports = (options = {}, ctx) => ({
   async clientDynamicModules() {
     return [
       {
-        name: "backlinks.js",
+        name: 'backlinks.js',
         content: `export default ${JSON.stringify(ctx.backLinks, null, 2)}`,
       },
     ]
   },
 
-  enhanceAppFiles: [path.resolve(__dirname, "clientPlugin.js")],
+  enhanceAppFiles: [path.resolve(__dirname, 'clientPlugin.js')],
 })
