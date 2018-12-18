@@ -78,6 +78,7 @@ module.exports = (options = {}, ctx) => ({
       Object.assign($page, { title: $page.path.split(/\/|_/).join(' ') })
 
     Object.assign($page, { pageLinks })
+    // ? Object.assign($page, { parsedLinks: pageLinks })
   },
 
   async clientDynamicModules() {
