@@ -48,9 +48,9 @@ module.exports = (options = {}, ctx) => ({
       const wl = match[1] && match[1].split('|')
       const linkPath = wl[wl.length - 1]
       const title = wl[0]
-      const { root } = path.parse(linkPath)
 
-      const link = root === '/' ? linkPath : path.join(pageDir, linkPath)
+      const link =
+        linkPath.charAt(0) === '/' ? linkPath : path.join(pageDir, linkPath)
       return { title, path: link }
     })
 
@@ -66,6 +66,8 @@ module.exports = (options = {}, ctx) => ({
         const linkPath = match && match[1]
         const { root } = path.parse(linkPath)
 
+        const linkAbsolute =
+          linkPath.charAt(0) === '/' ? linkPath : path.join(pageDir, linkPath)
         const link = root === "/" ? linkPath : path.join(pageDir, linkPath)
 
         return link
