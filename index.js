@@ -1,5 +1,5 @@
-const { path } = require('@vuepress/shared-utils')
-
+// const { path } = require('@vuepress/shared-utils')
+const path = require('path')
 module.exports = (options = {}, ctx) => ({
   name: 'vuepress-backlinks',
   extendMarkdown: md => {
@@ -14,15 +14,10 @@ module.exports = (options = {}, ctx) => ({
             return link.pageLinks
               .reduce((links, l) => [...links, l.path], [])
               .filter(parsedPath => {
-                const link = parsedPath
-                  .replace('.md', '')
-                  .replace('.html', '')
-                  .replace(/\//g, '')
-                const path = page.path
-                  .replace('.md', '')
-                  .replace('.html', '')
-                  .replace(/\//g, '')
-                return path === link
+                const pagePath = page.path.replace(path.extname(page.path), '')
+                return page._permalink
+                  ? path.resolve(page._permalink) === parsedPath
+                  : pagePath === parsedPath
               }).length
           })
           .map(link => ({
@@ -49,13 +44,11 @@ module.exports = (options = {}, ctx) => ({
       const linkPath = wl[wl.length - 1]
       const title = wl[0]
 
-      const link =
-        linkPath.charAt(0) === '/' ? linkPath : path.join(pageDir, linkPath)
+      const link = path.resolve(pageDir, linkPath)
       return { title, path: link }
     })
 
     // regex source: https://stackoverflow.com/questions/44511043
-    // /regex-to-match-local-markdown-links
     const linksMatch =
       content.match(
         /((!?\[[^\]]*?\])\((?:(?!http|www\.|\#|\.com|\.net|\.info|\.org).)*?\))/g
@@ -64,12 +57,14 @@ module.exports = (options = {}, ctx) => ({
       .map(mdLink => {
         const match = mdLink.match(/\((.*)\)/u)
         const matchTitle = mdLink.match(/\[(.*)\]/u)
+
         const title = matchTitle && matchTitle[1]
         const linkPath = match && match[1]
 
-        const linkAbsolute =
-          linkPath.charAt(0) === '/' ? linkPath : path.join(pageDir, linkPath)
-        const link = linkAbsolute.replace('.html', '').replace('.md', '')
+        const link = path
+          .resolve(pageDir, linkPath)
+          .replace(path.extname(linkPath), '')
+
         return { title, path: link }
       })
       .concat(wikiLinks)
