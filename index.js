@@ -63,7 +63,7 @@ module.exports = (options = {}, ctx) => ({
     const pageLinks = linksMatch
       .map(mdLink => {
         const match = mdLink.match(/\((.*)\)/u)
-        const linkPath = path.trimExt(match && match[1])
+        const linkPath = match && match[1]
         const { root } = path.parse(linkPath)
 
         const link = root === "/" ? linkPath : path.join(pageDir, linkPath)
